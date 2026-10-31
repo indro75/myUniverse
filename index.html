@@ -195,6 +195,51 @@
   @keyframes fadeIn { to { opacity: 1; transform: none; } }
   @keyframes riseHeart { 0% { transform: translateY(0) scale(0.8); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-120vh) scale(1.2); opacity: 0; } }
 
+  /* ---------- Complete button ---------- */
+  .complete-btn {
+    display: block;
+    margin: 2.5rem auto 3rem;
+    padding: 0.9rem 2.2rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background: linear-gradient(135deg, rgba(169,112,255,0.4), rgba(255,183,213,0.4));
+    border: 1px solid rgba(255,183,213,0.7);
+    border-radius: 999px;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.4s ease;
+    position: relative;
+    z-index: 3;
+    box-shadow: 0 0 20px rgba(255,183,213,0.3);
+  }
+  .complete-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 40px rgba(255,183,213,0.7);
+    border-color: #FFB7D5;
+    background: linear-gradient(135deg, rgba(169,112,255,0.6), rgba(255,183,213,0.6));
+  }
+  .complete-btn::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #FFB7D5, #A970FF);
+    z-index: -1;
+    opacity: 0;
+    filter: blur(12px);
+    transition: opacity 0.4s;
+  }
+  .complete-btn:hover::before { opacity: 0.8; }
+  .complete-btn.completed {
+    background: rgba(255,183,213,0.2);
+    border-color: rgba(255,183,213,0.5);
+    cursor: default;
+  }
+  .complete-btn.completed:hover { transform: none; box-shadow: 0 0 20px rgba(255,183,213,0.3); }
+
   @media (max-width: 600px) {
     .solar-system { width: 95vw; height: 95vw; }
     .planet { width: 70px; height: 70px; font-size: 1.8rem; }
@@ -248,7 +293,7 @@
     <p class="typewriter" id="moonlight-text"></p>
     <button class="glow-btn small" id="reveal-hidden-btn">Reveal a secret ✨</button>
     <p class="hidden-message" id="hidden-message" style="display:none;"></p>
-    <button class="text-link" id="done-moonlight">I've read it all 💫</button>
+    <button class="complete-btn" data-planet="moonlight">Complete ✨</button>
   </div>
 </section>
 
@@ -261,7 +306,7 @@
   <div class="glass-reveal" id="garden-reveal" style="display:none;">
     <div class="glass"><p id="garden-reveal-text"></p><button class="text-link" id="close-garden-reveal">close</button></div>
   </div>
-  <button class="text-link" id="done-heart" style="display:none; position:relative; z-index:3; margin-bottom:3rem;">I've seen them all 💫</button>
+  <button class="complete-btn" data-planet="heart_garden">Complete ✨</button>
 </section>
 
 <!-- MEMORY GALAXY -->
@@ -277,7 +322,7 @@
       <button class="text-link" id="close-lightbox">close</button>
     </div>
   </div>
-  <button class="text-link" id="done-memory" style="display:none; position:relative; z-index:3; margin-bottom:3rem;">Back to the galaxy 💫</button>
+  <button class="complete-btn" data-planet="memory_galaxy">Complete ✨</button>
 </section>
 
 <!-- LOVE QUEST -->
@@ -311,7 +356,7 @@
     <div class="glass center" style="max-width:500px; margin:0 auto;">
       <h3 style="font-family:'Playfair Display',serif; color:var(--pink); margin-bottom:1rem;">You completed the Love Quest! ❤️</h3>
       <p>A whole universe is proud of you.</p>
-      <button class="text-link" id="done-quest">Back to the galaxy 💫</button>
+      <button class="complete-btn" data-planet="love_quest">Complete ✨</button>
     </div>
   </div>
 </section>
@@ -457,6 +502,17 @@ const Progress = {
       el.classList.toggle('completed', !!p[k]);
       if(k==='secret') el.classList.toggle('locked', !p.secret_unlocked);
     });
+    // Sync complete buttons
+    document.querySelectorAll('.complete-btn').forEach(btn => {
+      const k = btn.dataset.planet;
+      if (p[k]) {
+        btn.textContent = 'Completed 💫';
+        btn.classList.add('completed');
+      } else {
+        btn.textContent = 'Complete ✨';
+        btn.classList.remove('completed');
+      }
+    });
   }
 };
 
@@ -464,7 +520,6 @@ const Progress = {
 const M = window.MEMORIES;
 const App = {
   init(){
-    // Welcome texts
     document.getElementById('welcome-name').textContent = M.girlfriend_name;
     document.getElementById('welcome-subtitle').textContent = M.welcome_subtitle;
     document.getElementById('enter-text').textContent = M.enter_button_text;
@@ -514,6 +569,20 @@ const App = {
       document.getElementById(id).classList.add('active');
       document.getElementById('back-btn').style.display = id==='screen-map' ? 'none' : 'inline-block';
       overlay.classList.remove('active');
+
+      // Sync complete button state
+      const prog = Progress.get();
+      document.querySelectorAll('.complete-btn').forEach(btn => {
+        const k = btn.dataset.planet;
+        if (prog[k]) {
+          btn.textContent = 'Completed 💫';
+          btn.classList.add('completed');
+        } else {
+          btn.textContent = 'Complete ✨';
+          btn.classList.remove('completed');
+        }
+      });
+
       if(id==='screen-moonlight') this.runMoonlight();
       if(id==='screen-heart') this.runHeartGarden();
       if(id==='screen-memory') this.runMemoryGalaxy();
@@ -544,41 +613,59 @@ const App = {
     document.getElementById('back-btn').addEventListener('click', () => this.openScreen('screen-map'));
     document.querySelectorAll('.back-to-map').forEach(b => b.addEventListener('click', () => this.openScreen('screen-map')));
 
-    // Moonlight
+    // Moonlight reveal
     document.getElementById('reveal-hidden-btn').addEventListener('click', () => {
       const el = document.getElementById('hidden-message');
       el.textContent = M.moonlight_hidden_message;
       el.style.display = 'block';
       Effects.hearts(innerWidth/2, innerHeight/2, 10);
     });
-    document.getElementById('done-moonlight').addEventListener('click', () => {
-      Progress.complete('moonlight');
-      this.openScreen('screen-map');
-    });
 
-    // Heart garden
+    // Heart garden close
     document.getElementById('close-garden-reveal').addEventListener('click', () => {
       document.getElementById('garden-reveal').style.display = 'none';
     });
-    document.getElementById('done-heart').addEventListener('click', () => {
-      Progress.complete('heart_garden');
-      this.openScreen('screen-map');
-    });
 
-    // Memory
+    // Memory lightbox close
     document.getElementById('close-lightbox').addEventListener('click', () => {
       document.getElementById('lightbox').style.display = 'none';
     });
-    document.getElementById('done-memory').addEventListener('click', () => {
-      Progress.complete('memory_galaxy');
-      this.openScreen('screen-map');
+
+    // ---------- Unified complete buttons ----------
+    document.querySelectorAll('.complete-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const planet = btn.dataset.planet;
+        if (!planet) return;
+        if (btn.classList.contains('completed')) return;
+
+        // Love Quest has its own completion logic — only mark complete after all 3 levels
+        if (planet === 'love_quest') {
+          const allDone = this.questState.levelsDone.every(Boolean);
+          if (!allDone) {
+            gsap.to(btn, { x:'+=6', duration:0.08, yoyo:true, repeat:5 });
+            return;
+          }
+        }
+
+        // Mark complete
+        Progress.complete(planet);
+        btn.textContent = 'Completed 💫';
+        btn.classList.add('completed');
+
+        // Celebration
+        const rect = btn.getBoundingClientRect();
+        Effects.hearts(rect.left + rect.width/2, rect.top, 12);
+        Effects.fireworks(rect.left + rect.width/2, rect.top + rect.height/2, 18);
+
+        // Return to galaxy after a short delay
+        setTimeout(() => this.openScreen('screen-map'), 1400);
+      });
     });
 
-    // Quest
+    // Quest level buttons
     document.querySelectorAll('.quest-level-btn').forEach(b => {
       b.addEventListener('click', () => this.startLevel(parseInt(b.dataset.level)));
     });
-    document.getElementById('done-quest').addEventListener('click', () => this.openScreen('screen-map'));
   },
 
   async runMoonlight(){
@@ -592,8 +679,6 @@ const App = {
     garden.innerHTML = '';
     const reveal = document.getElementById('garden-reveal');
     const revealText = document.getElementById('garden-reveal-text');
-    const doneBtn = document.getElementById('done-heart');
-    const opened = new Set();
     M.love_reasons.forEach((r, i) => {
       const f = document.createElement('div');
       f.className = 'flower';
@@ -602,13 +687,10 @@ const App = {
         revealText.textContent = r;
         reveal.style.display = 'flex';
         gsap.from(reveal.querySelector('.glass'), { scale:0.8, opacity:0, duration:0.5 });
-        opened.add(i);
         Effects.hearts(innerWidth/2, innerHeight/2, 6);
-        if(opened.size === M.love_reasons.length) doneBtn.style.display = 'inline-block';
       });
       garden.appendChild(f);
     });
-    doneBtn.style.display = 'none';
   },
 
   runMemoryGalaxy(){
@@ -617,9 +699,7 @@ const App = {
     const lb = document.getElementById('lightbox');
     const lbImg = document.getElementById('lightbox-img');
     const lbCap = document.getElementById('lightbox-caption');
-    const doneBtn = document.getElementById('done-memory');
-    const viewed = new Set();
-    M.memories.forEach((m, i) => {
+    M.memories.forEach((m) => {
       const p = document.createElement('div');
       p.className = 'polaroid';
       p.innerHTML = `<span class="date">${m.date}</span><img src="${m.image}" alt="${m.caption}" onerror="this.style.background='linear-gradient(135deg,#C8A7FF,#FFB7D5)';this.removeAttribute('src');"><span class="cap">${m.caption}</span>`;
@@ -628,12 +708,9 @@ const App = {
         lbCap.textContent = `${m.date} — ${m.caption}`;
         lb.style.display = 'flex';
         gsap.from(lb.querySelector('.lightbox-inner'), { scale:0.9, opacity:0, duration:0.5 });
-        viewed.add(i);
-        if(viewed.size === M.memories.length) doneBtn.style.display = 'inline-block';
       });
       tl.appendChild(p);
     });
-    doneBtn.style.display = 'none';
   },
 
   /* ---------- Love Quest ---------- */
@@ -765,7 +842,6 @@ const App = {
       ['quest-level-1','quest-level-2','quest-level-3'].forEach(id => document.getElementById(id).style.display='none');
       document.getElementById('quest-complete').style.display = 'block';
       Effects.confetti();
-      Progress.complete('love_quest');
     } else {
       setTimeout(() => {
         document.getElementById(`quest-level-${n}`).style.display = 'none';

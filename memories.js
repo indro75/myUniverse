@@ -28,12 +28,12 @@ window.MEMORIES = {
   ],
 
   memories: [
-    { date: "The First Day",     caption: "When my universe began.",     image: "images/memory1.jpg" },
-    { date: "Our First Adventure", caption: "The day the stars aligned.", image: "images/memory2.jpg" },
-    { date: "That Sunset",       caption: "Painted just for us.",       image: "images/memory3.jpg" },
-    { date: "Our Favorite Place", caption: "Where time stopped.",        image: "images/memory4.jpg" },
-    { date: "A Quiet Moment",    caption: "Just you, me, and the sky.",  image: "images/memory5.jpg" },
-    { date: "Today",             caption: "And every day after.",        image: "images/memory6.jpg" }
+    { date: "The First Day",       caption: "When my universe began.",     image: "images/memory1.jpg" },
+    { date: "Our First Adventure", caption: "The day the stars aligned.",  image: "images/memory2.jpg" },
+    { date: "That Sunset",         caption: "Painted just for us.",        image: "images/memory3.jpg" },
+    { date: "Our Favorite Place",  caption: "Where time stopped.",         image: "images/memory4.jpg" },
+    { date: "A Quiet Moment",      caption: "Just you, me, and the sky.",  image: "images/memory5.jpg" },
+    { date: "Today",               caption: "And every day after.",        image: "images/memory6.jpg" }
   ],
 
   quiz_questions: [
@@ -49,10 +49,10 @@ window.MEMORIES = {
   ],
 
   memory_pairs: [
-    { text: "First date",   match: "The little café downtown" },
-    { text: "First trip",   match: "The mountain with the view" },
-    { text: "Favorite meal",match: "The pasta place on 5th" },
-    { text: "Our song",     match: "The one we dance to at home" }
+    { text: "First date",    match: "The little café downtown" },
+    { text: "First trip",    match: "The mountain with the view" },
+    { text: "Favorite meal", match: "The pasta place on 5th" },
+    { text: "Our song",      match: "The one we dance to at home" }
   ],
 
   hidden_heart_messages: [
